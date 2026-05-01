@@ -38,7 +38,7 @@ def typing(chat_id):
 # ── Gemini helpers ────────────────────────────────────────────────
 def ask(system, prompt):
     response = gemini.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-1.5-flash",
         contents=prompt,
         config=genai.types.GenerateContentConfig(system_instruction=system)
     )

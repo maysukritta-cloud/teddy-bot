@@ -41,12 +41,14 @@ from google import genai
 from google.genai import types
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
+
 gemini = genai.Client(api_key=GEMINI_API_KEY)
 
 def ask(system, prompt):
     try:
         response = gemini.models.generate_content(
-            model="gemini-1.5-flash",
+            model=GEMINI_MODEL,
             contents=prompt,
             config=types.GenerateContentConfig(
                 system_instruction=system
@@ -61,6 +63,7 @@ def ask(system, prompt):
     except Exception as e:
         print("Gemini error:", e)
         return "⚠️ เกิดข้อผิดพลาด ลองใหม่ค่ะ"
+
 
 
 def detect_route(text):
@@ -96,12 +99,12 @@ def handle(data):
         return
 
     if text == "/start":
-        send(chat_id, "🟣 *Teddy พร้อมแล้วค่ะ*\n\nบอกอะไรก็ได้เลย — จะดูเองหรือส่งให้ Mory / Minnie นะคะ")
+        send(chat_id, "🟣 *Teddy พร้อมแล้วค่ะ*\n\nบอกอะไรก็ได้เลย")
         return
 
     hist = history.get(uid, [])
     ctx  = build_context(hist)
-    full = f"{ctx}\nเม้: {text}" if ctx else f"เม้: {text}"
+    full = f"{ctx}\nเม้: {text}" if ctx else f"เม: {text}"
 
     typing(chat_id)
 

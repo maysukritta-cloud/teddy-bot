@@ -3,7 +3,7 @@ import re
 import logging
 import requests
 from flask import Flask, request as flask_request
-import google.generativeai as genai
+from google import genai
 from prompts import TEDDY_PROMPT, MORY_PROMPT, MINNIE_PROMPT, YEN_PROMPT
 
 logging.basicConfig(
@@ -16,7 +16,7 @@ GEMINI_KEY  = os.environ["GEMINI_API_KEY"]
 ALLOWED_ID  = os.getenv("ALLOWED_USER_ID", "")
 RENDER_URL  = os.getenv("RENDER_URL", "")
 
-genai.configure(api_key=GEMINI_KEY)
+gemini = genai.Client(api_key=GEMINI_KEY)
 
 API = f"https://api.telegram.org/bot{TOKEN}"
 history: dict[str, list] = {}
@@ -37,8 +37,12 @@ def typing(chat_id):
 
 # ── Gemini helpers ────────────────────────────────────────────────
 def ask(system, prompt):
-    model = genai.GenerativeModel("gemini-1.5-flash", system_instruction=system)
-    return model.generate_content(prompt).text.strip()
+    response = gemini.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt,
+        config=genai.types.GenerateContentConfig(system_instruction=system)
+    )
+    return response.text.strip()
 
 def detect_route(text):
     t = text.lower()

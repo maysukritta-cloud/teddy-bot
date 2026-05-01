@@ -36,13 +36,32 @@ def typing(chat_id):
     })
 
 # ── Gemini helpers ────────────────────────────────────────────────
+import os
+from google import genai
+from google.genai import types
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+gemini = genai.Client(api_key=GEMINI_API_KEY)
+
 def ask(system, prompt):
-    response = gemini.models.generate_content(
-        model="gemini-1.5-flash",
-        contents=prompt,
-        config=genai.types.GenerateContentConfig(system_instruction=system)
-    )
-    return response.text.strip()
+    try:
+        response = gemini.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=system
+            )
+        )
+
+        if not response.text:
+            return "⚠️ Gemini ตอบกลับว่างเปล่าค่ะ"
+
+        return response.text.strip()
+
+    except Exception as e:
+        print("Gemini error:", e)
+        return "⚠️ เกิดข้อผิดพลาด ลองใหม่ค่ะ"
+
 
 def detect_route(text):
     t = text.lower()
